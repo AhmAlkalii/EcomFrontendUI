@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { menuItemModel } from '../../../Interfaces'
 import { Link } from 'react-router-dom';
+import { useUpdateShoppingCartMutation } from '../../../Apis/shoppingCartApi';
+import { MiniLoader } from '../Common';
 
 interface Props{
     menuItem: menuItemModel;
@@ -8,6 +10,22 @@ interface Props{
 
 
 function MenuItemCard(props: Props) {
+
+  const [updateShoppingCart] = useUpdateShoppingCartMutation();
+  const [isAddingToCart, setIsAddingToCart] = useState<boolean>(false);
+
+
+  const handleAddToCart = async () => {
+    setIsAddingToCart(true)
+    const response = await updateShoppingCart({
+        menuItemId: props.menuItem.id,
+        updateQuantityBy: 1,
+        userId: "4207f181-b34f-4900-b193-453711619ff9",
+    })
+    console.log(response)
+    setIsAddingToCart(false)
+  }
+
   return (
     <div className="col-md-4 col-12 p-4">
       <div
@@ -46,8 +64,21 @@ function MenuItemCard(props: Props) {
           }
           
 
-          <i
+          {
+            isAddingToCart?(
+              <div
+                style={{
+                  position: "absolute",
+                  top: "15px",
+                  right: "15px",
+                }}
+              >
+                <MiniLoader />
+              </div>
+            ):(
+            <i
             className="bi bi-cart-plus btn btn-outline-danger"
+            onClick={handleAddToCart}
             style={{
               position: "absolute",
               top: "15px",
@@ -57,7 +88,7 @@ function MenuItemCard(props: Props) {
               outline: "none !important",
               cursor: "pointer",
             }}
-          ></i>
+          ></i>)}
 
           <div className="text-center">
             <p className="card-title m-0 text-success fs-3">
